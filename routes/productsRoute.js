@@ -13,4 +13,19 @@ router.post('/add_product', async (request, response) => {
   }
 });
 
+router.get('/get_products', async (request, response) => {
+  try {
+    await productModel
+      .find({})
+      .then((products) => {
+        response.json({ products: products });
+      })
+      .catch((error) => {
+        res.json({ error: error });
+      });
+  } catch (error) {
+    response.status(500).send('Error Occured: ' + error.message);
+  }
+});
+
 module.exports = router;
