@@ -65,4 +65,30 @@ router.delete('/delete_product', async (request, response) => {
   }
 });
 
+//update product
+router.put('/update_product', async (request, response) => {
+  const product = new productModel(request.body);
+
+  const productObj = await productModel.findOne({ id: product.id });
+
+  productObj.title = product.title ? product.title : productObj.title;
+  productObj.description = product.description
+    ? product.description
+    : productObj.description;
+  productObj.price = product.price ? product.price : productObj.price;
+
+  try {
+    await productObj
+      .save()
+      .then((data) => {
+        response.json({ msg: `${productObj.title} is updated` });
+      })
+      .catch((error) => {
+        response.json({ error: error });
+      });
+  } catch (error) {
+    response.status(500).send('Error Occured: ' + error.message);
+  }
+});
+
 module.exports = router;
