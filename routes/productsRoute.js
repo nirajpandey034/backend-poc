@@ -11,7 +11,24 @@ router.get('/get_products', async (request, response) => {
         response.json({ products: products });
       })
       .catch((error) => {
-        res.json({ error: error });
+        response.json({ error: error });
+      });
+  } catch (error) {
+    response.status(500).send('Error Occured: ' + error.message);
+  }
+});
+
+//get single product
+router.post('/get_product', async (request, response) => {
+  const product = new productModel(request.body);
+  try {
+    await productModel
+      .findOne({ id: product.id })
+      .then((product) => {
+        response.json({ product: product });
+      })
+      .catch((error) => {
+        response.json({ error: error });
       });
   } catch (error) {
     response.status(500).send('Error Occured: ' + error.message);
@@ -41,7 +58,7 @@ router.delete('/delete_product', async (request, response) => {
         response.json({ msg: data });
       })
       .catch((error) => {
-        res.json({ error: error });
+        response.json({ error: error });
       });
   } catch (error) {
     response.status(500).send('Error Occured: ' + error.message);
