@@ -4,9 +4,11 @@ require('dotenv').config();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const userModel = require('../models/User');
+const role = require('../middleware/role');
+const auth = require('../middleware/auth');
 
 // get users
-router.get('/get_users', async (request, response) => {
+router.get('/get_users', auth, role, async (request, response) => {
   try {
     await userModel
       .find({})
@@ -21,22 +23,22 @@ router.get('/get_users', async (request, response) => {
   }
 });
 
-//get single product
-// router.post('/get_product', async (request, response) => {
-//   const product = new productModel(request.body);
-//   try {
-//     await productModel
-//       .findOne({ id: product.id })
-//       .then((product) => {
-//         response.json({ product: product });
-//       })
-//       .catch((error) => {
-//         response.json({ error: error });
-//       });
-//   } catch (error) {
-//     response.status(500).send('Error Occured: ' + error.message);
-//   }
-// });
+// get single user
+router.post('/get_user', async (request, response) => {
+  const user = new userModel(request.body);
+  try {
+    await userModel
+      .findById(user._id)
+      .then((user) => {
+        response.json({ user: user });
+      })
+      .catch((error) => {
+        response.json({ error: error });
+      });
+  } catch (error) {
+    response.status(500).send('Error Occured: ' + error.message);
+  }
+});
 
 // user registration
 router.post('/register_user', async (request, response) => {
@@ -60,7 +62,7 @@ router.post('/register_user', async (request, response) => {
       firstName,
       lastName,
       phoneNumber,
-      email: email, // sanitize: convert email to lowercase
+      email: email,
       password: encryptedPassword,
     });
     // Create token
@@ -87,7 +89,7 @@ router.post('/login_user', async (request, response) => {
 
     //validation
     if (!(email && password)) {
-      response.status(400).send('All input is required');
+      return response.status(400).send('All input is required');
     }
     // getting password from db and comparing it
     const user = await userModel.findOne({ email });
@@ -101,34 +103,34 @@ router.post('/login_user', async (request, response) => {
         }
       );
 
-      // user
-      response.status(200).json({ token: token, success: true });
+      // send response
+      return response.status(200).json({ token: token, success: true });
     }
-    response.status(400).json({ success: false });
+    return response.status(400).json({ success: false });
   } catch (err) {
     console.log(err);
   }
 });
 
-// //product deletion
-// router.delete('/delete_product', async (request, response) => {
-//   const product = new productModel(request.body);
+// User deletion
+router.delete('/delete_user', auth, async (request, response) => {
+  const user = new userModel(request.body);
 
-//   try {
-//     await productModel
-//       .deleteOne({ id: product.id })
-//       .then((data) => {
-//         response.json({ msg: data });
-//       })
-//       .catch((error) => {
-//         response.json({ error: error });
-//       });
-//   } catch (error) {
-//     response.status(500).send('Error Occured: ' + error.message);
-//   }
-// });
+  try {
+    await userModel
+      .findByIdAndDelete(user._id)
+      .then((data) => {
+        response.json({ msg: `User, ${data.firstName} is deleted` });
+      })
+      .catch((error) => {
+        response.json({ error: error });
+      });
+  } catch (error) {
+    response.status(500).send('Error Occured: ' + error.message);
+  }
+});
 
-// //update product
+// update user
 // router.put('/update_product', async (request, response) => {
 //   const product = new productModel(request.body);
 
