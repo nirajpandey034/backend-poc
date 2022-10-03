@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const productModel = require('../models/Product');
+const role = require('../middleware/role');
+const auth = require('../middleware/auth');
 
 // get products
 router.get('/get_products', async (request, response) => {
@@ -36,7 +38,7 @@ router.post('/get_product', async (request, response) => {
 });
 
 // product addition
-router.post('/add_product', async (request, response) => {
+router.post('/add_product', role, auth, async (request, response) => {
   const product = new productModel(request.body);
 
   try {
@@ -48,7 +50,7 @@ router.post('/add_product', async (request, response) => {
 });
 
 //product deletion
-router.delete('/delete_product', async (request, response) => {
+router.delete('/delete_product', role, auth, async (request, response) => {
   const product = new productModel(request.body);
 
   try {
@@ -66,7 +68,7 @@ router.delete('/delete_product', async (request, response) => {
 });
 
 //update product
-router.put('/update_product', async (request, response) => {
+router.put('/update_product', role, auth, async (request, response) => {
   const product = new productModel(request.body);
 
   const productObj = await productModel.findOne({ id: product.id });
