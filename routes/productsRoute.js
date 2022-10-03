@@ -10,7 +10,7 @@ router.get('/get_products', async (request, response) => {
     await productModel
       .find({})
       .then((products) => {
-        response.json({ products: products });
+        response.json({ data: products });
       })
       .catch((error) => {
         response.json({ error: error });
@@ -27,7 +27,7 @@ router.post('/get_product', async (request, response) => {
     await productModel
       .findOne({ id: product.id })
       .then((product) => {
-        response.json({ product: product });
+        response.json({ data: product });
       })
       .catch((error) => {
         response.json({ error: error });
@@ -43,9 +43,11 @@ router.post('/add_product', role, auth, async (request, response) => {
 
   try {
     await product.save();
-    response.send(`${product.title} is added successfully`);
+    response
+      .status(200)
+      .json({ info: `${product.title} is added successfully` });
   } catch (error) {
-    response.status(500).send('Error Occured: ' + error.message);
+    response.status(500).json({ error: 'Error Occured: ' + error.message });
   }
 });
 
@@ -57,13 +59,13 @@ router.delete('/delete_product', role, auth, async (request, response) => {
     await productModel
       .deleteOne({ id: product.id })
       .then((data) => {
-        response.json({ msg: data });
+        response.status(200).json({ info: 'Deleted successfully' });
       })
       .catch((error) => {
         response.json({ error: error });
       });
   } catch (error) {
-    response.status(500).send('Error Occured: ' + error.message);
+    response.status(500).json({ error: 'Error Occured: ' + error.message });
   }
 });
 
@@ -83,13 +85,13 @@ router.put('/update_product', role, auth, async (request, response) => {
     await productObj
       .save()
       .then((data) => {
-        response.json({ msg: `${productObj.title} is updated` });
+        response.json({ info: `${productObj.title} is updated` });
       })
       .catch((error) => {
         response.json({ error: error });
       });
   } catch (error) {
-    response.status(500).send('Error Occured: ' + error.message);
+    response.status(500).json({ error: 'Error Occured: ' + error.message });
   }
 });
 
