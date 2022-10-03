@@ -46,7 +46,7 @@ router.post('/register_user', async (request, response) => {
 
     //validation
     if (!(email && password && firstName && lastName && phoneNumber)) {
-      response.status(400).send('All input is required');
+      return response.status(400).send('All input is required');
     }
     //checking existing user
     const oldUser = await userModel.findOne({ email });
@@ -60,7 +60,7 @@ router.post('/register_user', async (request, response) => {
       firstName,
       lastName,
       phoneNumber,
-      email: email.toLowerCase(), // sanitize: convert email to lowercase
+      email: email, // sanitize: convert email to lowercase
       password: encryptedPassword,
     });
     // Create token
@@ -73,7 +73,7 @@ router.post('/register_user', async (request, response) => {
     );
 
     // return new user
-    response.status(201).json({ token: token, success: true });
+    return response.status(201).json({ token: token, success: true });
   } catch (err) {
     console.log(err);
   }
